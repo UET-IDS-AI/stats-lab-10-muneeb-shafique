@@ -5,18 +5,31 @@ import numpy as np
 # Question 1: Joint Gaussian PDF and Marginals
 # -------------------------------------------------
 
-def joint_gaussian_pdf(x, y, mu_x=1, mu_y=-2, sigma_x=2, sigma_y=3, rho=0.6):
+def joint_gaussian_pdf(
+    x,
+    y,
+    mu_x=1,
+    mu_y=-2,
+    sigma_x=2,
+    sigma_y=3,
+    rho=0.6
+):
     """
     Return the bivariate Gaussian PDF f_XY(x,y).
     """
 
     q = (
         ((x - mu_x) ** 2) / (sigma_x ** 2)
-        - 2 * rho * ((x - mu_x) * (y - mu_y)) / (sigma_x * sigma_y)
+        - (
+            2
+            * rho
+            * (x - mu_x)
+            * (y - mu_y)
+        ) / (sigma_x * sigma_y)
         + ((y - mu_y) ** 2) / (sigma_y ** 2)
     )
 
-    coeff = (
+    coefficient = (
         1 /
         (
             2
@@ -31,7 +44,7 @@ def joint_gaussian_pdf(x, y, mu_x=1, mu_y=-2, sigma_x=2, sigma_y=3, rho=0.6):
         -q / (2 * (1 - rho ** 2))
     )
 
-    return coeff * exponent
+    return coefficient * exponent
 
 
 def marginal_pdf_x(x, mu_x=1, sigma_x=2):
@@ -39,13 +52,17 @@ def marginal_pdf_x(x, mu_x=1, sigma_x=2):
     Return marginal Gaussian PDF of X.
     """
 
-    coeff = 1 / (np.sqrt(2 * np.pi) * sigma_x)
-
-    exponent = np.exp(
-        -((x - mu_x) ** 2) / (2 * sigma_x ** 2)
+    coefficient = (
+        1 /
+        (np.sqrt(2 * np.pi) * sigma_x)
     )
 
-    return coeff * exponent
+    exponent = np.exp(
+        -((x - mu_x) ** 2) /
+        (2 * sigma_x ** 2)
+    )
+
+    return coefficient * exponent
 
 
 def marginal_pdf_y(y, mu_y=-2, sigma_y=3):
@@ -53,23 +70,37 @@ def marginal_pdf_y(y, mu_y=-2, sigma_y=3):
     Return marginal Gaussian PDF of Y.
     """
 
-    coeff = 1 / (np.sqrt(2 * np.pi) * sigma_y)
-
-    exponent = np.exp(
-        -((y - mu_y) ** 2) / (2 * sigma_y ** 2)
+    coefficient = (
+        1 /
+        (np.sqrt(2 * np.pi) * sigma_y)
     )
 
-    return coeff * exponent
+    exponent = np.exp(
+        -((y - mu_y) ** 2) /
+        (2 * sigma_y ** 2)
+    )
+
+    return coefficient * exponent
 
 
-def covariance_matrix(sigma_x=2, sigma_y=3, rho=0.6):
+def covariance_matrix(
+    sigma_x=2,
+    sigma_y=3,
+    rho=0.6
+):
     """
     Return covariance matrix.
     """
 
     return np.array([
-        [sigma_x ** 2, rho * sigma_x * sigma_y],
-        [rho * sigma_x * sigma_y, sigma_y ** 2]
+        [
+            sigma_x ** 2,
+            rho * sigma_x * sigma_y
+        ],
+        [
+            rho * sigma_x * sigma_y,
+            sigma_y ** 2
+        ]
     ])
 
 
@@ -82,7 +113,8 @@ def joint_pdf_grid_integral(
     n=250
 ):
     """
-    Numerically approximate integral of joint Gaussian PDF.
+    Numerically approximate integral
+    of joint Gaussian PDF.
     """
 
     x_vals = np.linspace(
@@ -97,9 +129,6 @@ def joint_pdf_grid_integral(
         n
     )
 
-    dx = x_vals[1] - x_vals[0]
-    dy = y_vals[1] - y_vals[0]
-
     X, Y = np.meshgrid(x_vals, y_vals)
 
     Z = joint_gaussian_pdf(
@@ -112,9 +141,18 @@ def joint_pdf_grid_integral(
         rho
     )
 
-    integral = np.sum(Z) * dx * dy
+    integral_y = np.trapz(
+        Z,
+        y_vals,
+        axis=0
+    )
 
-    return integral
+    integral = np.trapz(
+        integral_y,
+        x_vals
+    )
+
+    return float(integral)
 
 
 # -------------------------------------------------
@@ -131,7 +169,8 @@ def generate_joint_gaussian_samples(
     seed=0
 ):
     """
-    Generate n samples from a jointly Gaussian distribution.
+    Generate n samples from a jointly
+    Gaussian distribution.
     """
 
     np.random.seed(seed)
@@ -156,43 +195,69 @@ def generate_joint_gaussian_samples(
     return x_samples, y_samples
 
 
-def sample_means(x_samples, y_samples):
+def sample_means(
+    x_samples,
+    y_samples
+):
     """
     Return sample means of X and Y.
     """
 
-    return np.mean(x_samples), np.mean(y_samples)
+    mean_x = np.mean(x_samples)
+    mean_y = np.mean(y_samples)
+
+    return float(mean_x), float(mean_y)
 
 
-def sample_covariance_matrix(x_samples, y_samples):
+def sample_covariance_matrix(
+    x_samples,
+    y_samples
+):
     """
     Return 2 by 2 sample covariance matrix.
+    Uses denominator n-1.
     """
 
-    return np.cov(x_samples, y_samples, ddof=1)
+    return np.cov(
+        x_samples,
+        y_samples,
+        ddof=1
+    )
 
 
-def sample_correlation(x_samples, y_samples):
+def sample_correlation(
+    x_samples,
+    y_samples
+):
     """
     Return sample correlation coefficient.
     """
 
-    return np.corrcoef(x_samples, y_samples)[0, 1]
+    corr = np.corrcoef(
+        x_samples,
+        y_samples
+    )[0, 1]
+
+    return float(corr)
 
 
 def gaussian_independence_check(rho):
     """
     For jointly Gaussian variables:
-    return True if rho is zero, otherwise False.
+    return True if rho is zero,
+    otherwise False.
     """
 
-    return rho == 0
+    return bool(rho == 0)
 
 
-def zero_rho_covariance_check(n=100000):
+def zero_rho_covariance_check(
+    n=100000
+):
     """
-    Generate samples with rho=0 and check that
-    sample covariance is approximately zero.
+    Generate samples with rho=0
+    and check sample covariance
+    is approximately zero.
     """
 
     x, y = generate_joint_gaussian_samples(
@@ -201,22 +266,34 @@ def zero_rho_covariance_check(n=100000):
         seed=42
     )
 
-    cm = sample_covariance_matrix(x, y)
+    cm = sample_covariance_matrix(
+        x,
+        y
+    )
 
-    return abs(cm[0, 1]) < 0.05
+    return bool(
+        abs(cm[0, 1]) < 0.05
+    )
 
 
-def nonzero_rho_covariance_check(n=100000):
+def nonzero_rho_covariance_check(
+    n=100000
+):
     """
-    Generate samples with rho=0.6 and check that
-    sample covariance is close to rho*sigma_x*sigma_y.
+    Generate samples with rho=0.6
+    and check covariance is close
+    to rho*sigma_x*sigma_y.
     """
 
     rho = 0.6
     sigma_x = 2
     sigma_y = 3
 
-    expected_cov = rho * sigma_x * sigma_y
+    expected_cov = (
+        rho
+        * sigma_x
+        * sigma_y
+    )
 
     x, y = generate_joint_gaussian_samples(
         n=n,
@@ -226,6 +303,11 @@ def nonzero_rho_covariance_check(n=100000):
         seed=42
     )
 
-    cm = sample_covariance_matrix(x, y)
+    cm = sample_covariance_matrix(
+        x,
+        y
+    )
 
-    return abs(cm[0, 1] - expected_cov) < 0.15
+    return bool(
+        abs(cm[0, 1] - expected_cov) < 0.15
+    )
