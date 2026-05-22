@@ -47,36 +47,52 @@ def joint_gaussian_pdf(
     return coefficient * exponent
 
 
-def marginal_pdf_x(x, mu_x=1, sigma_x=2):
+def marginal_pdf_x(
+    x,
+    mu_x=1,
+    sigma_x=2
+):
     """
     Return marginal Gaussian PDF of X.
     """
 
     coefficient = (
         1 /
-        (np.sqrt(2 * np.pi) * sigma_x)
+        (
+            np.sqrt(2 * np.pi)
+            * sigma_x
+        )
     )
 
     exponent = np.exp(
-        -((x - mu_x) ** 2) /
+        -((x - mu_x) ** 2)
+        /
         (2 * sigma_x ** 2)
     )
 
     return coefficient * exponent
 
 
-def marginal_pdf_y(y, mu_y=-2, sigma_y=3):
+def marginal_pdf_y(
+    y,
+    mu_y=-2,
+    sigma_y=3
+):
     """
     Return marginal Gaussian PDF of Y.
     """
 
     coefficient = (
         1 /
-        (np.sqrt(2 * np.pi) * sigma_y)
+        (
+            np.sqrt(2 * np.pi)
+            * sigma_y
+        )
     )
 
     exponent = np.exp(
-        -((y - mu_y) ** 2) /
+        -((y - mu_y) ** 2)
+        /
         (2 * sigma_y ** 2)
     )
 
@@ -114,7 +130,7 @@ def joint_pdf_grid_integral(
 ):
     """
     Numerically approximate integral
-    of joint Gaussian PDF.
+    of the joint Gaussian PDF.
     """
 
     x_vals = np.linspace(
@@ -129,7 +145,10 @@ def joint_pdf_grid_integral(
         n
     )
 
-    X, Y = np.meshgrid(x_vals, y_vals)
+    X, Y = np.meshgrid(
+        x_vals,
+        y_vals
+    )
 
     Z = joint_gaussian_pdf(
         X,
@@ -141,13 +160,13 @@ def joint_pdf_grid_integral(
         rho
     )
 
-    integral_y = np.trapz(
+    integral_y = np.trapezoid(
         Z,
         y_vals,
         axis=0
     )
 
-    integral = np.trapz(
+    integral = np.trapezoid(
         integral_y,
         x_vals
     )
@@ -169,7 +188,7 @@ def generate_joint_gaussian_samples(
     seed=0
 ):
     """
-    Generate n samples from a jointly
+    Generate samples from a jointly
     Gaussian distribution.
     """
 
@@ -214,7 +233,7 @@ def sample_covariance_matrix(
     y_samples
 ):
     """
-    Return 2 by 2 sample covariance matrix.
+    Return 2x2 sample covariance matrix.
     Uses denominator n-1.
     """
 
@@ -243,9 +262,8 @@ def sample_correlation(
 
 def gaussian_independence_check(rho):
     """
-    For jointly Gaussian variables:
-    return True if rho is zero,
-    otherwise False.
+    For jointly Gaussian variables,
+    independence occurs when rho=0.
     """
 
     return bool(rho == 0)
@@ -256,8 +274,7 @@ def zero_rho_covariance_check(
 ):
     """
     Generate samples with rho=0
-    and check sample covariance
-    is approximately zero.
+    and verify covariance is near zero.
     """
 
     x, y = generate_joint_gaussian_samples(
@@ -281,7 +298,7 @@ def nonzero_rho_covariance_check(
 ):
     """
     Generate samples with rho=0.6
-    and check covariance is close
+    and verify covariance is close
     to rho*sigma_x*sigma_y.
     """
 
